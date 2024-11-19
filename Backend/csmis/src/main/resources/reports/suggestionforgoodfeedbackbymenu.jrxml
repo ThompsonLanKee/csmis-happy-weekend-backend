@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="suggestionforgoodfeedbackbymenu" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="d167ef44-27b3-4525-a49c-835d994e4f15">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MenuWeekReport"/>
+	<parameter name="menu_id" class="java.lang.Long"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT 
+    m.day_name AS day_of_week,
+    m.date AS menu_date,
+    f.suggestion_content,
+    ROW_NUMBER() OVER (ORDER BY f.id) AS suggestion_no
+FROM 
+    menu m
+LEFT JOIN 
+    feedback f ON f.menu_id = m.id
+LEFT JOIN 
+    feedbackcategory fc ON f.feedbackcategory_id = fc.id
+WHERE 
+    m.id = $P{menu_id}
+    AND fc.category_name = 'Good'
+    AND f.suggestion_content IS NOT NULL
+ORDER BY 
+    f.id]]>
+	</queryString>
+	<field name="day_of_week" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="day_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="day_of_week"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="menu"/>
+	</field>
+	<field name="menu_date" class="java.sql.Date">
+		<property name="com.jaspersoft.studio.field.name" value="date"/>
+		<property name="com.jaspersoft.studio.field.label" value="menu_date"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="menu"/>
+	</field>
+	<field name="suggestion_content" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="suggestion_content"/>
+		<property name="com.jaspersoft.studio.field.label" value="suggestion_content"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="feedback"/>
+	</field>
+	<field name="suggestion_no" class="java.math.BigInteger">
+		<property name="com.jaspersoft.studio.field.name" value="suggestion_no"/>
+		<property name="com.jaspersoft.studio.field.label" value="suggestion_no"/>
+	</field>
+	<field name="date" class="java.sql.Date"/>
+	<field name="day_name" class="java.lang.String"/>
+	<group name="DateGroup">
+		<groupExpression><![CDATA[$F{date}]]></groupExpression>
+		<groupHeader>
+			<band height="52">
+				<textField>
+					<reportElement x="-10" y="-1" width="450" height="20" forecolor="#ADB81F" uuid="c96a395d-27d3-48de-9813-544ff39b416b"/>
+					<textElement textAlignment="Left">
+						<font size="14" isBold="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA["Suggestion For Good Feedback Menu" + $F{day_name} + " " + $F{date}]]></textFieldExpression>
+				</textField>
+				<staticText>
+					<reportElement mode="Opaque" x="60" y="22" width="285" height="30" backcolor="#C99738" uuid="5d20e163-9e10-4379-83c8-8f03ab142491"/>
+					<box>
+						<pen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+						<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#050505"/>
+						<leftPen lineWidth="2.0" lineStyle="Solid" lineColor="#080808"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#050505"/>
+						<rightPen lineWidth="2.0" lineStyle="Solid" lineColor="#080808"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="16" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Suggestion for Good Feed back]]></text>
+				</staticText>
+				<staticText>
+					<reportElement mode="Opaque" x="4" y="22" width="56" height="30" backcolor="#C99738" uuid="aab1fd35-86e3-4281-885a-ccdc9c3c141a"/>
+					<box>
+						<pen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+						<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#050505"/>
+						<leftPen lineWidth="2.0" lineStyle="Solid" lineColor="#080808"/>
+						<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#050505"/>
+						<rightPen lineWidth="2.0" lineStyle="Solid" lineColor="#080808"/>
+					</box>
+					<textElement textAlignment="Center">
+						<font fontName="Times New Roman" size="16" isBold="true"/>
+					</textElement>
+					<text><![CDATA[No]]></text>
+				</staticText>
+			</band>
+		</groupHeader>
+	</group>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<columnHeader>
+		<band height="8" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="31">
+			<textField>
+				<reportElement mode="Opaque" x="60" y="0" width="285" height="31" backcolor="#F9FC9A" uuid="ace2f715-c450-475e-9099-a23b2f55de27"/>
+				<box>
+					<pen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<leftPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<rightPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{suggestion_content}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement mode="Opaque" x="4" y="-1" width="56" height="32" backcolor="#F9FC9A" uuid="727fb5cf-3f60-4000-941c-57658d962f6d"/>
+				<box>
+					<pen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<topPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<leftPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<bottomPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+					<rightPen lineWidth="2.0" lineStyle="Solid" lineColor="#0D0901"/>
+				</box>
+				<textElement textAlignment="Center">
+					<font size="14"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{suggestion_no}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

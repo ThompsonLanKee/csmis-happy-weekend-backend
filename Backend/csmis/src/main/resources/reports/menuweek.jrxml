@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="menuweek" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="c3fa6ac5-a9f6-4c33-b6f2-21779b4047e2">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MenuWeekReport"/>
+	<parameter name="menuweek_id" class="java.lang.Long"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+        m.day_name,
+        me.meal_name,
+        CASE
+            WHEN me.mealcategory_id = 4 AND m.optional_meal_id IS NOT NULL
+            THEN CONCAT(me.meal_name, ' (သို့) ', (SELECT meal_name FROM meal WHERE id = m.optional_meal_id))
+            ELSE me.meal_name
+        END AS meal_display_name,
+        CASE
+            WHEN m.day_name = 'တနင်္လာ' THEN 1
+            WHEN m.day_name = 'အင်္ဂါ' THEN 2
+            WHEN m.day_name = 'ဗုဒ္ဓဟူး' THEN 3
+            WHEN m.day_name = 'ကြာသပတေး' THEN 4
+            WHEN m.day_name = 'သောကြာ' THEN 5
+            WHEN m.day_name = 'စနေနေ့' THEN 6
+            WHEN m.day_name = 'တနင်္ဂနွေ' THEN 7
+        END AS day_order,
+        cc.centre_name, cc.address, cc.phone,
+        m.date,
+        me.mealcategory_id,
+        -- New field for Monday's date
+        (SELECT m2.date
+        FROM menu m2
+        WHERE m2.day_name = 'တနင်္လာ' AND m2.date IS NOT NULL
+        LIMIT 1) AS monday_date
+    FROM
+        menuweek mw
+    JOIN
+        menuweek_has_menus mwhm ON mw.id = mwhm.menuweek_id
+    JOIN
+        menu m ON mwhm.menu_id = m.id
+    JOIN
+        menu_has_meals mhm ON m.id = mhm.menu_id
+    JOIN
+        cateringcentre cc ON mw.cateringcentre_id = cc.id
+    JOIN
+        meal me ON mhm.meal_id = me.id
+    WHERE
+        mw.id = $P{menuweek_id}
+    ORDER BY
+        day_order, me.mealcategory_id, me.meal_name]]>
+	</queryString>
+	<field name="meal_display_name" class="java.lang.String"/>
+	<field name="day_name" class="java.lang.String"/>
+	<field name="monday_date" class="java.sql.Date"/>
+	<field name="meal_name" class="java.lang.String"/>
+	<field name="centre_name" class="java.lang.String"/>
+	<field name="address" class="java.lang.String"/>
+	<field name="phone" class="java.lang.String"/>
+	<group name="day_nameGroup">
+		<groupExpression><![CDATA[$F{day_name}]]></groupExpression>
+		<groupHeader>
+			<band height="27">
+				<textField>
+					<reportElement x="234" y="7" width="93" height="20" forecolor="#F70515" uuid="765e89bc-2736-48b0-aa40-d8ccd574b840"/>
+					<textElement textAlignment="Center">
+						<font fontName="Myanmar3" size="12" isBold="true" pdfEncoding="Unicode" isPdfEmbedded="true"/>
+					</textElement>
+					<textFieldExpression><![CDATA[$F{day_name}]]></textFieldExpression>
+				</textField>
+				<line>
+					<reportElement x="231" y="26" width="93" height="1" uuid="3aaa2b3a-cbe8-467d-a38b-cccb9ca0931d"/>
+				</line>
+			</band>
+		</groupHeader>
+		<groupFooter>
+			<band height="6"/>
+		</groupFooter>
+	</group>
+	<title>
+		<band height="90">
+			<textField>
+				<reportElement x="80" y="0" width="400" height="20" forecolor="#058AFF" uuid="cac7a2fc-8cc9-45f6-ba80-47649451357d"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{centre_name}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="20" width="400" height="20" uuid="c5dcf47e-5257-4012-8e52-f3037e27228f"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{address}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="40" width="400" height="20" uuid="8e2902cb-cb89-4cb2-9e7c-7bdfd2d3eea2"/>
+				<textElement textAlignment="Center">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{phone}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="80" y="70" width="400" height="20" uuid="f72cdd69-b441-477c-bdae-e4e3353775f0"/>
+				<textElement textAlignment="Right">
+					<font size="12"/>
+				</textElement>
+				<textFieldExpression><![CDATA[new java.text.SimpleDateFormat("MM/dd/yyyy").format($F{monday_date})]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<detail>
+		<band height="22">
+			<textField>
+				<reportElement x="30" y="2" width="500" height="20" uuid="0d546693-06f7-4c16-b8e0-42bc00548c6b"/>
+				<textElement textAlignment="Center">
+					<font size="12" pdfEncoding="Unicode" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{meal_display_name} != null ? $F{meal_display_name} : $F{meal_name}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="60" splitType="Stretch">
+			<staticText>
+				<reportElement x="225" y="0" width="110" height="30" forecolor="#137FF2" uuid="5bee1a83-da2c-4b76-9fea-0e7836295ddf"/>
+				<textElement>
+					<font size="14" pdfEncoding="Unicode" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[ကျေးဇူးတင်ပါသည်]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="44" y="30" width="475" height="30" forecolor="#137FF2" uuid="0ccb9148-eb8d-464e-b9c0-61eff5695cc8"/>
+				<textElement textAlignment="Center">
+					<font size="14" pdfEncoding="Unicode" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[အသားငါးရရှိမှုပေါ်မူတည်ပြီး အချို့ဟင်းလျာများပြောင်းလဲနိုင်ပါသည်။]]></text>
+			</staticText>
+		</band>
+	</pageFooter>
+</jasperReport>

@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="weeklychartforgoodfeedback" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="ac27fa6a-62cf-4bcf-ba58-70cbfbf0bcc7">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MenuWeekReport"/>
+	<parameter name="menuweek_id" class="java.lang.Long"/>
+	<queryString language="SQL">
+		<![CDATA[SELECT
+    m.day_name AS menu_name,
+    COUNT(CASE WHEN fc.category_name = 'Bad' THEN ft.id END) AS type_count
+FROM
+    (SELECT 'တနင်္လာ' AS day_name
+     UNION ALL
+     SELECT 'အင်္ဂါ'
+     UNION ALL
+     SELECT 'ဗုဒ္ဓဟူး'
+     UNION ALL
+     SELECT 'ကြာသပတေး'
+     UNION ALL
+     SELECT 'သောကြာ') m -- Create a derived table for the specific days
+LEFT JOIN
+    menuweek mw ON mw.id = $P{menuweek_id}
+LEFT JOIN
+    menuweek_has_menus mwm ON mw.id = mwm.menuweek_id
+LEFT JOIN
+    menu menu ON mwm.menu_id = menu.id AND menu.day_name = m.day_name -- Join with menu to filter by day
+LEFT JOIN
+    feedback f ON f.menu_id = menu.id
+LEFT JOIN
+    feedbackcategory fc ON f.feedbackcategory_id = fc.id
+LEFT JOIN
+    feedback_has_feedbacktypes fht ON fht.feedback_id = f.id
+LEFT JOIN
+    feedbacktype ft ON fht.feedbacktype_id = ft.id
+WHERE
+    mw.id = $P{menuweek_id} -- Still filter by menuweek ID
+GROUP BY
+    m.day_name
+ORDER BY
+    FIELD(m.day_name, 'တနင်္လာ', 'အင်္ဂါ', 'ဗုဒ္ဓဟူး', 'ကြာသပတေး', 'သောကြာ')]]>
+	</queryString>
+	<field name="menu_name" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.name" value="day_name"/>
+		<property name="com.jaspersoft.studio.field.label" value="menu_name"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="menu"/>
+	</field>
+	<field name="type_count" class="java.lang.Long">
+		<property name="com.jaspersoft.studio.field.name" value="type_count"/>
+		<property name="com.jaspersoft.studio.field.label" value="type_count"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="16" splitType="Stretch"/>
+	</title>
+	<summary>
+		<band height="289" splitType="Stretch">
+			<pieChart>
+				<chart evaluationTime="Report">
+					<reportElement x="80" y="40" width="400" height="249" uuid="7a96c34e-24e8-4cc9-8f78-882893eb8145"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset>
+					<keyExpression><![CDATA[$F{menu_name}]]></keyExpression>
+					<valueExpression><![CDATA[$F{type_count}]]></valueExpression>
+					<labelExpression><![CDATA[$F{type_count} + ""]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<staticText>
+				<reportElement x="130" y="10" width="300" height="30" forecolor="#0F7BFF" uuid="93991a97-09ac-4053-84b1-0070b1dd4acf"/>
+				<textElement textAlignment="Center">
+					<font size="14" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Bad FeedBack Pie Chart By Day]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

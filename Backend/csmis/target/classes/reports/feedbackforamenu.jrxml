@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.20.5.final using JasperReports Library version 6.20.5-3efcf2e67f959db3888d79f73dde2dbd7acb4f8e  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="feedbackforamenu" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="9b0e39f7-64a8-4f63-999f-cc7ac171fe9e">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MenuWeekReport"/>
+	<parameter name="menu_id" class="java.lang.Long"/>
+	<parameter name="SUBREPORT" class="net.sf.jasperreports.engine.JasperReport"/>
+
+	<queryString language="SQL">
+		<![CDATA[SELECT
+            m.day_name AS menu_name,
+            m.date,
+            fc.category_name AS feedback_category,
+            ft.type_name AS type_name,
+            COUNT(ft.id) AS type_count
+        FROM
+            menu m
+        JOIN
+            feedback f ON f.menu_id = m.id
+        JOIN
+            feedbackcategory fc ON f.feedbackcategory_id = fc.id
+        JOIN
+            feedback_has_feedbacktypes fht ON fht.feedback_id = f.id
+        JOIN
+            feedbacktype ft ON fht.feedbacktype_id = ft.id
+        WHERE
+            fc.category_name IN ('Good', 'Bad') AND
+            m.id = $P{menu_id}
+        GROUP BY
+            m.id, fc.category_name, ft.id
+        ORDER BY
+            m.id, feedback_category, type_count DESC]]>
+	</queryString>
+	<field name="menu_name" class="java.lang.String"/>
+	<field name="feedback_category" class="java.lang.String"/>
+	<field name="type_name" class="java.lang.String"/>
+	<field name="type_count" class="java.lang.Long"/>
+	<field name="date" class="java.util.Date"/>
+	<variable name="BadFeedbackCount" class="java.lang.Long" calculation="Sum">
+		<variableExpression><![CDATA[$F{type_count}]]></variableExpression>
+		<initialValueExpression><![CDATA[$F{feedback_category}.equals("Bad") ? 1 : 0]]></initialValueExpression>
+	</variable>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="33" splitType="Stretch">
+			<textField>
+				<reportElement mode="Transparent" x="172" y="3" width="550" height="25" forecolor="#0C7866" uuid="309c6cc4-d7d5-4c00-a039-3bcff1731039"/>
+				<textElement>
+					<font size="15" isBold="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Good And Bad Feedback Report For " + $F{menu_name} + " (" + new java.text.SimpleDateFormat("yyyy-MM-dd").format($F{date}) + ")"]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="10">
+			<subreport>
+				<reportElement x="265" y="0" width="100" height="10" uuid="ffc5a868-b135-4bb3-b93b-316019cb1a17"/>
+				<subreportParameter name="menu_id">
+					<subreportParameterExpression><![CDATA[$P{menu_id}]]></subreportParameterExpression>
+				</subreportParameter>
+				<connectionExpression><![CDATA[$P{REPORT_CONNECTION}]]></connectionExpression>
+				<subreportExpression><![CDATA[$P{SUBREPORT}]]></subreportExpression>
+			</subreport>
+		</band>
+	</pageHeader>
+	<summary>
+		<band height="262" splitType="Stretch">
+			<pieChart>
+				<chart evaluationTime="Report">
+					<reportElement x="0" y="27" width="400" height="235" uuid="e91f9031-a1b3-42fb-862c-16f68f759647">
+						<printWhenExpression><![CDATA[$F{feedback_category}.equals("Good") && $F{type_count} > 0]]></printWhenExpression>
+					</reportElement>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset maxCount="16">
+					<dataset>
+						<incrementWhenExpression><![CDATA[$F{feedback_category}.equals("Good")]]></incrementWhenExpression>
+					</dataset>
+					<keyExpression><![CDATA[$F{type_name}]]></keyExpression>
+					<valueExpression><![CDATA[$F{type_count}]]></valueExpression>
+					<labelExpression><![CDATA[$F{type_count} + ""]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<pieChart>
+				<chart evaluationTime="Report">
+					<reportElement x="400" y="27" width="400" height="235" uuid="1247d4d2-836d-43ae-9af2-18bb654c848d"/>
+					<chartTitle/>
+					<chartSubtitle/>
+					<chartLegend/>
+				</chart>
+				<pieDataset maxCount="16">
+					<dataset>
+						<incrementWhenExpression><![CDATA[$F{feedback_category}.equals("Bad")]]></incrementWhenExpression>
+					</dataset>
+					<keyExpression><![CDATA[$F{type_name}]]></keyExpression>
+					<valueExpression><![CDATA[$F{type_count}]]></valueExpression>
+					<labelExpression><![CDATA[$F{type_count} + ""]]></labelExpression>
+				</pieDataset>
+				<piePlot>
+					<plot/>
+					<itemLabel/>
+				</piePlot>
+			</pieChart>
+			<staticText>
+				<reportElement x="120" y="2" width="190" height="25" uuid="6d5b7dc1-cfa8-49f6-ab44-9d940e4fae25">
+					<printWhenExpression><![CDATA[$F{feedback_category}.equals("Good") && $F{type_count} > 0]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Good Feedback Chart]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="515" y="2" width="190" height="25" uuid="f6bee64e-b7f6-46cd-8b82-c425296f8b26">
+					<printWhenExpression><![CDATA[$F{type_count} > 0 || $F{feedback_category}.equals("Bad")]]></printWhenExpression>
+				</reportElement>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[Bad Feedback Chart]]></text>
+			</staticText>
+		</band>
+	</summary>
+</jasperReport>

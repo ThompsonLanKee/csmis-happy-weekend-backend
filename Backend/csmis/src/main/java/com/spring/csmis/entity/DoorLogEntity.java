@@ -24,6 +24,9 @@ public class DoorLogEntity {
     @OneToOne(mappedBy = "doorLog")
     private EmployeeEntity employee;
 
+
+    @Column(nullable = false)
+    private boolean deleted = false;  // Soft delete flag
 //    @OneToMany(mappedBy = "doorLog", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<DoorLogAccessTransactionEntity> accessTransactions = new ArrayList<>();
 

@@ -9,5 +9,8 @@ import java.util.List;
 public interface DoorLogRepository  extends JpaRepository<DoorLogEntity, Long> {
     DoorLogEntity findByDoorLogNo(String doorLogNo);
 
+    List<DoorLogEntity> findByDeletedFalse();
+
+
     //List<DoorLogEntity> findByDoorLogNo(String doorLogNo);
 }

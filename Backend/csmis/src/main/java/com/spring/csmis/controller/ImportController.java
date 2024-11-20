@@ -40,17 +40,6 @@ public class ImportController {
 
     @PostMapping("/upload")
     public ResponseEntity<String> uploadFile(@RequestParam("file") MultipartFile file) {
-//        if (file.isEmpty()) {
-//            return ResponseEntity.badRequest().body("Please upload a file!");
-//        }
-//
-//        try {
-//            String message = importService.importDataFromExcel(file.getInputStream());
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while importing data.");
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body("Three data imported");
 
         if (file.isEmpty()) {
             return ResponseEntity.badRequest().body("Please upload a file!");
@@ -59,10 +48,20 @@ public class ImportController {
         try {
             // Import all data from the Excel file (Division, Department, Team, Employee)
             String message = importService.importDataFromExcel(file.getInputStream());
-            return ResponseEntity.ok(message);
+
+            // Check if the message indicates success
+            if (message == null || message.isEmpty()) {
+                return ResponseEntity.ok("File imported successfully!");
+            } else {
+                return ResponseEntity.ok(message);
+            }
         } catch (IOException e) {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error occurred while importing data.");
+        } catch (Exception e) {
+            // Handle unexpected errors
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("An unexpected error occurred.");
         }
     }
 

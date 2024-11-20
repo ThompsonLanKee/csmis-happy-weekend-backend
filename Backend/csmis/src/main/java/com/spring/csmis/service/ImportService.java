@@ -67,15 +67,26 @@ public class ImportService {
                 }
                 TeamEntity team = findOrCreateTeam(teamName, department);
 
+                String doorlogName = extractCellValue(row.getCell(9));
+                if (doorlogName == null) {
+                    logger.warn("Skipping row {} due to missing Team", row.getRowNum());
+                    continue;
+                }
+                DoorLogEntity doorLog = findOrCreateDoorlog(doorlogName);
+
                 // Process Employee
-                EmployeeEntity employee = createEmployeeFromRow(row, division, department, team);
+                EmployeeEntity employee = createEmployeeFromRow(row, division, department, team,doorLog);
                 if (employee != null) {
                     employeeRepository.save(employee);
                     logger.info("Employee '{}' added successfully.", employee.getName());
                 }
             }
             return "Data imported successfully!";
-        }
+        }  catch (Exception e) {
+            e.printStackTrace();
+            return "Error occurred during data import: " + e.getMessage();
+    }
+
     }
 
     // Helper method to extract cell values
@@ -102,6 +113,16 @@ public class ImportService {
                 });
     }
 
+    private DoorLogEntity findOrCreateDoorlog(String doorLogNo) {
+        return doorLogRepository.findAllByDoorLogNo(doorLogNo).stream()
+                .findFirst()
+                .orElseGet(() -> {
+                    DoorLogEntity doorlog = new DoorLogEntity();
+                    doorlog.setDoorLogNo(doorLogNo);
+                    return doorLogRepository.save(doorlog);
+                });
+    }
+
     private DepartmentEntity findOrCreateDepartment(String name, DivisionEntity division) {
         return departmentRepository.findByNameAndDivision(name, division).stream()
                 .findFirst()
@@ -124,7 +145,7 @@ public class ImportService {
                 });
     }
 
-    private EmployeeEntity createEmployeeFromRow(Row row, DivisionEntity division, DepartmentEntity department, TeamEntity team) {
+    private EmployeeEntity createEmployeeFromRow(Row row, DivisionEntity division, DepartmentEntity department, TeamEntity team,DoorLogEntity doorLog) {
         try {
             // Validate and extract required fields
             String staffId = extractCellValue(row.getCell(1));
@@ -161,15 +182,15 @@ public class ImportService {
             }
 
             // DoorLog
-            String doorLogNo = extractCellValue(row.getCell(9));
-            DoorLogEntity doorLogEntity = null;
-            if (doorLogNo != null && !doorLogNo.isEmpty()) {
-                doorLogEntity = doorLogRepository.findByDoorLogNo(doorLogNo);
-                if (doorLogEntity == null) {
-                    logger.warn("No matching DoorLogEntity found for DoorLogNo: '{}'", doorLogNo);
-                    return null;
-                }
-            }
+//            String doorLogNo = extractCellValue(row.getCell(9));
+//            DoorLogEntity doorLogEntity = null;
+//            if (doorLogNo != null && !doorLogNo.isEmpty()) {
+//                doorLogEntity = doorLogRepository.findByDoorLogNo(doorLogNo);
+//                if (doorLogEntity == null) {
+//                    logger.warn("No matching DoorLogEntity found for DoorLogNo: '{}'", doorLogNo);
+//                    return null;
+//                }
+//            }
 
             // Create and populate EmployeeEntity
             EmployeeEntity employee = new EmployeeEntity();
@@ -181,7 +202,7 @@ public class ImportService {
             employee.setDivision(division);
             employee.setDepartment(department);
             employee.setTeam(team);
-            employee.setDoorLog(doorLogEntity);
+            employee.setDoorLog(doorLog);
             employee.setDeleted(false);
 
 
